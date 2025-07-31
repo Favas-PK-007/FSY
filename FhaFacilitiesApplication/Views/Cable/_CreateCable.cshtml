@@ -1,0 +1,136 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model.CableViewModel != null && Model.CableViewModel.UniqueID > 0;
+    var title = isEdit ? "Edit Existing Cable" : "Add New Cable";
+    var buttonLabel = isEdit ? "Update" : "Add";
+    // Build attributes for the Cable Model dropdown
+    var cableModelAttributes = new Dictionary<string, object>
+    {
+        { "class", "form-select" },
+        { "id", "CableModel" }
+    };
+
+    if (isEdit)
+    {
+        cableModelAttributes.Add("disabled", "disabled");
+    }
+}
+
+<div class="modal-content">
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">@title</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "cableForm" }))
+    {
+        @Html.HiddenFor(m => m.CableViewModel.UniqueID, new { @id = "hdnCableUniqueId" })
+        @Html.HiddenFor(m => m.CableViewModel.UniqueGUID, new { @id = "hdnCableUniqueGUID" })
+
+        <div class="modal-body pb-0" style="max-height: 70vh; overflow-y: auto;">
+            <div class="row g-4">
+
+                <!-- Cable Type -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.CableViewModel.CableType, "Cable Type", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.CableViewModel.CableType, Model.CableViewModel.CableTypeList, "Select Cable Type", new { @class = "form-select", @id = "CableType" })
+                    @Html.ValidationMessageFor(m => m.CableViewModel.CableType, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Cable Model (conditionally disabled on edit) -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.CableViewModel.TypeGUID, "Cable Model", new { @class = "form-label" })
+                    @Html.DropDownListFor(
+                             m => m.CableViewModel.TypeGUID,
+                             Model.CableViewModel.CableModelList,
+                             "Select Cable Model",
+                             new
+                             {
+                                 @class = "form-select",
+                                 @id = "CableModel",
+                                 cableModelAttributes
+                             })
+                    @Html.ValidationMessageFor(m => m.CableViewModel.TypeGUID, "", new { @class = "text-danger" })
+
+                    @* Hidden field to post selected value when disabled *@
+                    @if (isEdit)
+                    {
+                        @Html.HiddenFor(m => m.CableViewModel.TypeGUID)
+                    }
+                </div>
+
+                <!-- Cable ID -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.CableViewModel.CableID, "Cable ID", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.CableViewModel.CableID, new { @class = "form-control", @id = "CableTextID" })
+                    @Html.ValidationMessageFor(m => m.CableViewModel.CableID, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Splice A -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.CableViewModel.SpliceAGUID, "Splice A", new { @class = "form-label" })
+                    <select id="SpliceA" name="CableViewModel.SpliceAGUID" class="form-select">
+                        <option value="">Select a splice</option>
+                        @foreach (var splice in Model.CableViewModel.SpliceAList)
+                        {
+                            var isSelected = splice.Value == Model.CableViewModel.SpliceAGUID?.ToString() ? "selected" : "";
+                            @Html.Raw($"<option value=\"{splice.Value}\" {isSelected}>{splice.Text}</option>")
+                        }
+                    </select>
+                </div>
+
+                <!-- Splice B -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.CableViewModel.SpliceBGUID, "Splice B", new { @class = "form-label" })
+                    <select id="SpliceB" name="CableViewModel.SpliceBGUID" class="form-select">
+                        <option value="">Select a splice</option>
+                        @foreach (var splice in Model.CableViewModel.SpliceBList)
+                        {
+                            var isSelected = splice.Value == Model.CableViewModel.SpliceBGUID?.ToString() ? "selected" : "";
+                            @Html.Raw($"<option value=\"{splice.Value}\" {isSelected}>{splice.Text}</option>")
+                        }
+                    </select>
+                </div>
+
+                <!-- Cable Fibers Section -->
+                <div class="col-12">
+                    <!-- Section Label -->
+                    <label class="form-label fw-semibold mb-2">Cable Fibers</label>
+
+                    <!-- Fiber Tree View (replaced dynamically) -->
+                    <!-- This renders the _GetGenerateFibers partial view -->
+                    <!-- 'model="Model"' passes the current view model -->
+                    <!-- 'view-data=...' passes additional values like 'IsEdit' -->
+                    <div id="GenerateFibersDiv">
+                        <partial name="_GetGenerateFibers" model="Model" view-data='new ViewDataDictionary(ViewData) { { "IsEdit", isEdit } }' />
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- Comments -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.CableViewModel.Comments, "Comments", new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.CableViewModel.Comments, new { @class = "form-control", rows = 4, @id = "CableComments" })
+                    @Html.ValidationMessageFor(m => m.CableViewModel.Comments, "", new { @class = "text-danger" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal-footer border-0 gap-3">
+            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+            <button type="submit" id="btnSubmitCable" class="btn btn-primary">@buttonLabel</button>
+        </div>
+    }
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#cableForm");
+    });
+</script>

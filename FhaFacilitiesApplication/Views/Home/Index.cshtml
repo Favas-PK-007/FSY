@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     ViewData["Title"] = "Home Page";
 }
 
@@ -6,3 +6,257 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+ *@
+
+<!-- Campus and Building UI - Full Razor View + JavaScript -->
+@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Campus List";
+    bool hasData = Model.Campuses != null && Model.Campuses.Any();
+}
+
+<!-- Campus Section -->
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6 p-0">
+            <label class="form-label fw-bold mb-2">Select Campus</label>
+            <div class="d-flex align-items-start" id="campusController">
+                @{
+                    await Html.RenderPartialAsync("~/views/Campus/_CampusController.cshtml", Model);
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Building Section -->
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6 p-0">
+            <label class="form-label fw-bold mb-2">Select Building</label>
+            <div class="d-flex align-items-start" id="buildingController">
+                @{
+                    await Html.RenderPartialAsync("~/views/Building/_GetBuildings.cshtml", Model);
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Structure Section -->
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6 p-0">
+            <label class="form-label fw-bold mb-2">Select Structure</label>
+            <div class="d-flex align-items-start" id="structureController">
+                @{
+                    await Html.RenderPartialAsync("~/views/Structure/_GetStructure.cshtml", Model);
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Campus Modal -->
+<div class="modal fade" id="addCampusModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content" id="addCampusModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Building Modal -->
+<div class="modal fade" id="addBuildingModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content" id="addBuildingModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Structure Modal -->
+<div class="modal fade" id="addStructureModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content" id="addStructureModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedCampusGuid = null;
+
+    function loadCampusForm(id) {
+        $('#addCampusModal').modal('show');
+        $.ajax({
+            url: '@Url.Action("_CampusCreate", "Campus")',
+            type: 'GET',
+            data: { uniqueID: id },
+            success: function (result) {
+                $('#addCampusModelContainer').html(result);
+            },
+            error: function () {
+                $('#addCampusModelContainer').html("<p class='text-danger'>Failed to load form.</p>");
+            }
+        });
+    }
+
+    function loadCampusPartial() {
+        $.ajax({
+            url: '@Url.Action("_CampusController", "Campus")',
+            type: 'GET',
+            success: function (html) {
+                $('#campusController').html(html);
+            }
+        });
+    }
+
+    function loadBuildingsByCampus(campusGuid) {
+        $.ajax({
+            url: '@Url.Action("_GetBuildings", "Building")',
+            type: 'GET',
+            data: { campusGuid: campusGuid },
+            success: function (html) {
+                $('#buildingController').html(html);
+                $('#btnBuildingAdd').prop('disabled', false);
+            }
+        });
+    }
+
+    function loadBuildingForm(uniqueId = null) {
+        $('#addBuildingModal').modal('show');
+
+        $.ajax({
+            url: '@Url.Action("_CreateBuilding", "Building")',
+            type: 'GET',
+            data: uniqueId ? { uniqueId: uniqueId } : {},
+            success: function (result) {
+                $('#addBuildingModelContainer').html(result);
+            },
+            error: function () {
+                $('#addBuildingModelContainer').html("<p class='text-danger'>Failed to load form.</p>");
+            }
+        });
+    }
+
+
+
+    $(document).ready(function () {
+
+        $(document).on('change', 'input[name="campusRadio"]', function () {
+            const selected = $('input[name="campusRadio"]:checked');
+            selectedCampusGuid = selected.data('unique-guid');
+            const uniqueId = selected.val();
+
+            if (selectedCampusGuid) {
+                $('#btnEdit, #btnDelete').show();
+                loadBuildingsByCampus(selectedCampusGuid);
+            } else {
+                $('#btnEdit, #btnDelete').hide();
+            }
+        });
+
+        $('#btnAdd').on('click', function () { loadCampusForm(); });
+        $('#btnEdit').on('click', function () {
+            const id = $('input[name="campusRadio"]:checked').val();
+            loadCampusForm(id);
+        });
+        $('#btnDelete').on('click', function () {
+            const id = $('input[name="campusRadio"]:checked').val();
+            if (id && confirm("Are you sure you want to delete this campus?")) {
+                window.location.href = '@Url.Action("DeleteCampus", "Campus")/' + id;
+            }
+        });
+
+        $(document).on('click', '#btnSubmitCampus', function (e) {
+            e.preventDefault();
+            if (!$('#campusForm').valid()) return;
+
+            const campusData = {
+                UniqueId: parseInt($('#hdnUniqueId').val()) || 0,
+                CampusId: $('#CampusId').val(),
+                Designation: $('#Designation').val(),
+                Latitude: parseFloat($('#Latitude').val()) || 0,
+                Longitude: parseFloat($('#Longitude').val()) || 0,
+                Comments: $('#Comments').val(),
+                UniqueGUID: $('#hdnUniqueGUID').val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("SaveCampus", "Campus")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(campusData),
+                success: function (response) {
+                    loadCampusPartial();
+                    toastrmssg({ message: response.message, type: response.type });
+                    $('#addCampusModal').modal('hide');
+                }
+            });
+        });
+
+            $(document).on('change', 'input[name="buildingRadio"]', function () {
+        const selected = $('input[name="buildingRadio"]:checked').val();
+        const isSelected = !!selected;
+
+        $('#btnBuildingEdit, #btnBuildingDelete').prop('disabled', !isSelected);
+    });
+
+
+        // Add Building
+        $(document).on('click', '#btnBuildingAdd', function () {
+            loadBuildingForm(); // no ID passed
+        });
+
+        // Edit Building
+        $(document).on('click', '#btnBuildingEdit', function () {
+            const id = $('input[name="buildingRadio"]:checked').val();
+            console.log("Selected Building ID:", id);
+            if (id) {
+                loadBuildingForm(id);
+            } else {
+                alert("Please select a building to edit.");
+            }
+        });
+
+
+        $('#btnBuildingDelete').on('click', function () {
+            const id = $('input[name="buildingRadio"]:checked').val();
+            if (id && confirm("Are you sure you want to delete this building?")) {
+                window.location.href = '@Url.Action("DeleteBuilding", "Building")/' + id;
+            }
+        });
+
+        $(document).on('click', '#btnSubmitBuilding', function (e) {
+            e.preventDefault();
+            if (!$('#buildingForm').valid()) return;
+
+            const buildingData = {
+                CampusGUID: selectedCampusGuid,
+                BuildingId: $('#BuildingId').val(),
+                Designation: $('#BuildingDesignation').val(),
+                Latitude: parseFloat($('#BuildingLatitude').val()) || 0,
+                Longitude: parseFloat($('#BuildingLongitude').val()) || 0,
+                Comments: $('#BuildingComments').val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("AddBuilding", "Building")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(buildingData),
+                success: function (response) {
+                    toastrmssg({ message: response.message, type: response.type });
+                    $('#addBuildingModal').modal('hide');
+                    if (selectedCampusGuid) loadBuildingsByCampus(selectedCampusGuid);
+                },
+                error: function () {
+                    toastrmssg({ message: 'Failed to save building.', type: 'error' });
+                }
+            });
+        });
+
+    });
+</script>

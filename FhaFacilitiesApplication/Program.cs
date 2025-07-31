@@ -1,10 +1,11 @@
+using FhaFacilitiesApplication.HelperExtension;
 using FhaFacilitiesApplication.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
-
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+builder.Services.AddInvalidModelStateResponse();
 // Register all services
 builder.Services.AddServices();
 // Register all repositories
@@ -29,6 +30,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Dashboard}/{action=GetCampus}/{id?}");
+    pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
 app.Run();

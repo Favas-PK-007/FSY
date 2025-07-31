@@ -1,0 +1,14 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.EquipmentViewModel
+
+@Html.Label("ddlEquipmentModel", "Equipment Model", new { @class = "form-label" })
+
+@Html.DropDownList(
+                "ddlEquipmentModel",
+                Model.EquipmentModelList ?? new List<SelectListItem>(),
+                Model.EquipmentModelList != null && Model.EquipmentModelList.Any() ? "Select Model" : "",
+                new
+                {
+                    @class = "form-select",
+                    @id = "ddlEquipmentModel",
+                    disabled = (Model.EquipmentModelList == null || !Model.EquipmentModelList.Any()) ? "disabled" : null
+                })

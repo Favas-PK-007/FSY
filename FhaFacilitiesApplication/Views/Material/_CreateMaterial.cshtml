@@ -1,0 +1,127 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model?.MaterialViewModel?.IsEdit == true;
+    var title = isEdit ? "Edit Material" : "Add Material";
+    var buttonLabel = isEdit ? "Update" : "Add";
+}
+
+<div class="modal-content">
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">@title</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "materialForm" }))
+    {
+        @Html.Hidden("UniqueId", Model.MaterialViewModel.UniqueID, new { id = "hdnMaterialUniqueId" })
+        @Html.Hidden("UniqueGuid", Model.MaterialViewModel.UniqueGUID, new { id = "hdnMaterialUniqueGuid" })
+
+        <div class="modal-body pb-0">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="row g-4">
+                        <!-- Material Type -->
+                        <div class="col-sm-6">
+                            @Html.Label("MaterialType", "Material Type", new { @class = "form-label", @for = "ddlMaterialType" })
+                            <select id="ddlMaterialType" name="MaterialType" class="form-select">
+                                <option value="">Select Material Type</option>
+                                @foreach (var item in Model.MaterialViewModel.MaterialTypeList)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Parent Material -->
+                        <div class="col-sm-6">
+                            @Html.Label("ParentMaterial", "Parent Material", new { @class = "form-label", @for = "ddlParentMaterial" })
+                            <select id="ddlParentMaterial" name="ParentMaterial" class="form-select">
+                                <option value="">Select Parent Material</option>
+                                @foreach (var item in Model.MaterialViewModel.ParentMaterialList)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        @{
+                            if (isEdit)
+                            {
+                                <div class="col-12" id="modelIdDropdownContainer">
+                                    @Html.Label("ModelIdDropdown", "Model ID *", new { @class = "form-label" })
+                                    <select id="ddlModelId" name="ModelId" class="form-select">
+                                        <option value="">Select Model ID</option>
+                                    </select>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-12" id="modelIdTextboxContainer">
+                                    @Html.Label("ModelIdTextbox", "Model ID *", new { @class = "form-label" })
+                                    <input type="text" id="txtModelId" name="ModelId" class="form-control" />
+                                </div>
+                            }
+                        }
+
+
+                        <!-- Manufacturer -->
+                        <div class="col-12">
+                            @Html.Label("Manufacturer", "Manufacturer", new { @class = "form-label", @for = "ddlManufacturer" })
+                            <select id="ddlManufacturer" name="Manufacturer" class="form-select">
+                                <option value="">Select Manufacturer</option>
+                                @foreach (var item in Model.MaterialViewModel.ManufacturerList)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="col-12">
+                            @Html.Label("Comments", "Comments", new { @class = "form-label", @for = "txtComments" })
+                            <textarea id="txtComments" name="Comments" class="form-control" rows="4">@Model.MaterialViewModel.Comments</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material Table -->
+                <div class="col-lg-6 add">
+                    <div class="add-materials d-flex flex-column" style="height: 100%;">
+                        <!-- Scrollable table area -->
+                        <div class="table-responsive flex-grow-1 overflow-auto" style="max-height: 350px;">
+                            <table class="table table-bordered" id="materialDetailsTable">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Header</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="materialTableBody">
+                                    <!-- Add dynamic rows via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Sticky Delete button -->
+                        <div class="mt-2 text-end">
+                            <button type="button" class="btn btn-red" id="btnDeleteMaterialRow">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer border-0 gap-3">
+            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="btnSubmitMaterial" class="btn btn-primary">@buttonLabel</button>
+        </div>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $.validator.unobtrusive.parse("#materialForm");
+        });
+    </script>
+</div>

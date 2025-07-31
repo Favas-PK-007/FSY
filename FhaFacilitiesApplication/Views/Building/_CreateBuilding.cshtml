@@ -1,0 +1,67 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model.BuildingViewModel != null && Model.BuildingViewModel.UniqueId > 0;
+    var title = isEdit ? "Edit Building" : "Add New Building";
+    var buttonLabel = isEdit ? "Update" : "Save";
+}
+
+<div class="modal-content">
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">@title</h6>
+        <button type="button"
+                class="btn-close shadow-none"
+                data-bs-dismiss="modal"
+                aria-label="Close"></button>
+    </div>
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "buildingForm" }))
+    {
+        @Html.HiddenFor(m => m.BuildingViewModel.UniqueId, new { id = "hdnUniqueId" })
+        @Html.HiddenFor(m => m.BuildingViewModel.CampusGuid, new { id = "hdnCampusGuid" })
+        @Html.HiddenFor(m => m.BuildingViewModel.UniqueGUID, new { id = "hdnUniqueGUID" })
+
+        <div class="modal-body pb-0">
+            <div class="row g-4">
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.BuildingViewModel.BuildingId, "Building Id", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.TextBoxFor(m => m.BuildingViewModel.BuildingId, new { @class = "form-control", id = "BuildingId" })
+                    @Html.ValidationMessageFor(m => m.BuildingViewModel.BuildingId, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.BuildingViewModel.Designation, new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.TextBoxFor(m => m.BuildingViewModel.Designation, new { @class = "form-control", id = "BuildingDesignation" })
+                    @Html.ValidationMessageFor(m => m.BuildingViewModel.Designation, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.BuildingViewModel.Latitude, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.BuildingViewModel.Latitude, new { @class = "form-control", id = "BuildingLatitude" })
+                    @Html.ValidationMessageFor(m => m.BuildingViewModel.Latitude, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.BuildingViewModel.Longitude, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.BuildingViewModel.Longitude, new { @class = "form-control", id = "BuildingLongitude" })
+                    @Html.ValidationMessageFor(m => m.BuildingViewModel.Longitude, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-12">
+                    @Html.LabelFor(m => m.BuildingViewModel.Comments, new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.BuildingViewModel.Comments, new { @class = "form-control", id = "BuildingComments", rows = "4" })
+                    @Html.ValidationMessageFor(m => m.BuildingViewModel.Comments, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="modal-footer border-0 gap-3">
+        <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="btnSubmitBuilding" class="btn btn-primary">@buttonLabel</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#buildingForm");
+    });
+</script>

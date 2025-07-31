@@ -1,0 +1,73 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model.CampusViewModel != null && Model.CampusViewModel.UniqueId > 0;
+    var title = isEdit ? "Edit Campus" : "Add New Campus";
+    var buttonLabel = isEdit ? "Update" : "Save";
+}
+
+
+<div class="modal-content">
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">@title</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "campusForm" }))
+    {
+        @Html.HiddenFor(model => model.CampusViewModel.UniqueId, new { @id = "hdnUniqueId" })
+        @Html.HiddenFor(model => model.CampusViewModel.UniqueGUID, new { @id = "hdnUniqueGUID" })
+
+        <div class="modal-body pb-0">
+            <div class="row g-4">
+                <div class="col-sm-6">
+                    @Html.LabelFor(model => model.CampusViewModel.CampusId,"Campus Id", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.TextBoxFor(model => model.CampusViewModel.CampusId, new { @class = "form-control", @id = "CampusId" })
+                    @Html.ValidationMessageFor(model => model.CampusViewModel.CampusId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-sm-6">
+                    @Html.LabelFor(model => model.CampusViewModel.Designation, new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.TextBoxFor(model => model.CampusViewModel.Designation, new { @class = "form-control", @id = "Designation" })
+                    @Html.ValidationMessageFor(model => model.CampusViewModel.Designation, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-sm-6">
+                    @Html.LabelFor(model => model.CampusViewModel.Latitude, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.CampusViewModel.Latitude, new { @class = "form-control", @id = "Latitude" })
+                    @Html.ValidationMessageFor(model => model.CampusViewModel.Latitude, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-sm-6">
+                    @Html.LabelFor(model => model.CampusViewModel.Longitude, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.CampusViewModel.Longitude, new { @class = "form-control", @id = "Longitude" })
+                    @Html.ValidationMessageFor(model => model.CampusViewModel.Longitude, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-12">
+                    @Html.LabelFor(model => model.CampusViewModel.Comments, new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.CampusViewModel.Comments, new { @class = "form-control", rows = 4, @id = "Comments" })
+                    @Html.ValidationMessageFor(model => model.CampusViewModel.Comments, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer border-0 gap-3">
+            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="btnSubmitCampus" class="btn btn-primary">@buttonLabel</button>
+        </div>
+    }
+</div>
+
+
+
+    <script>
+  
+
+    $(document).ready(function () {
+
+       $.validator.unobtrusive.parse("#campusForm");
+    });
+</script>

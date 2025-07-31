@@ -1,0 +1,108 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    // Get the 'isEdit' flag from ViewData (passed from parent view)
+    var isEdit = ViewData["IsEdit"] != null && (bool)ViewData["IsEdit"];
+}
+
+<div class="tree-view-container bg-light p-3 rounded border" style="min-height: 100px;">
+    @if (Model?.CableFiberViewModel?.Buffers?.Any() == true)
+    {
+        <ul class="tree-view">
+            <li>
+                <div class="d-flex align-items-center" id="toggleFiberRoot" style="cursor: pointer;">
+                    <span class="indicator me-1">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </span>
+                    <label class="fw-normal mb-0">Fibers in Cable</label>
+                </div>
+
+                <ul id="fiberRootList" class="collapse">
+                    @foreach (var buffer in Model.CableFiberViewModel.Buffers)
+                    {
+                        var hasRibbons = buffer.Ribbons?.Any() == true;
+                        var hasFibers = buffer.Fibers?.Any() == true;
+
+                        <li>
+                            <div class="d-flex align-items-start gap-1">
+                                @if (hasRibbons || hasFibers)
+                                {
+                                    <span class="indicator" style="cursor:pointer;">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="indicator invisible">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </span>
+                                }
+
+                                <label class="mb-0">@buffer.Text</label>
+                            </div>
+
+                            @if (hasRibbons)
+                            {
+                                <ul class="child" style="display: none;">
+                                    @foreach (var ribbon in buffer.Ribbons)
+                                    {
+                                        var hasRibbonFibers = ribbon.Fibers?.Any() == true;
+
+                                        <li>
+                                            <div class="d-flex align-items-start gap-1">
+                                                @if (hasRibbonFibers)
+                                                {
+                                                    <span class="indicator" style="cursor:pointer;">
+                                                        <i class="fa-solid fa-chevron-right"></i>
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="indicator invisible">
+                                                        <i class="fa-solid fa-chevron-right"></i>
+                                                    </span>
+                                                }
+
+                                                <label class="mb-0">@ribbon.Text</label>
+                                            </div>
+
+                                            @if (hasRibbonFibers)
+                                            {
+                                                <ul class="child" style="display: none;">
+                                                    @foreach (var fiber in ribbon.Fibers)
+                                                    {
+                                                        <li><label class="mb-0">@fiber.Text</label></li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else if (hasFibers)
+                            {
+                                <ul class="child" style="display: none;">
+                                    @foreach (var fiber in buffer.Fibers)
+                                    {
+                                        <li><label class="mb-0">@fiber.Text</label></li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                </ul>
+            </li>
+        </ul>
+    }
+</div>
+
+<!-- Show Add Fiber button only in Edit mode AND no Buffers -->
+@if (isEdit && (Model.CableFiberViewModel?.Buffers?.Any() != true))
+{
+    <div class="d-flex gap-2 mt-3 add-edit-btns">
+        <button type="button" class="btn add" title="Generate Fibers" id="btnAddFiber">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+}
+

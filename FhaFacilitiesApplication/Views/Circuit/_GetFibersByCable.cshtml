@@ -1,0 +1,83 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.CircuitViewModel
+
+@if (Model?.BufferList?.Any() == true)
+{
+
+    <ul class="tree-view">
+        <li>
+            <div class="d-flex align-items-center" id="toggleCircuitFiberRoot" style="cursor: pointer;">
+                <span class="indicator me-1">
+                    <i class="fa-solid fa-chevron-down"></i> <!-- default expanded -->
+                </span>
+                <div class="form-check mb-0">
+                    <input class="form-check-input circuit-checkbox" type="checkbox" id="circuitCheckbox" />
+                    <label class="form-check-label fw-normal" for="circuitCheckbox">
+                        @Model.BufferList.FirstOrDefault()?.CableId
+                    </label>
+                </div>
+            </div>
+
+            <ul id="circuitFiberRootList">
+                @foreach (var buffer in Model.BufferList)
+                {
+                    var hasRibbons = buffer.Ribbons?.Any() == true;
+
+                    <li>
+                        <div class="d-flex align-items-start gap-1">
+                            <span class="indicator" style="cursor: pointer;">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </span>
+                            <div class="form-check mb-0">
+                                <input class="form-check-input buffer-checkbox" type="checkbox" id="buffer_@buffer.UniqueGUID" />
+                                <label class="form-check-label" for="buffer_@buffer.BufferID">Buffer-@buffer.BufferID</label>
+                            </div>
+                        </div>
+
+                        @if (hasRibbons)
+                        {
+                            <ul class="child">
+                                @foreach (var ribbon in buffer.Ribbons)
+                                {
+                                    var hasRibbonFibers = ribbon.Fibers?.Any() == true;
+
+                                    <li>
+                                        <div class="d-flex align-items-start gap-1">
+                                            <span class="indicator" style="cursor: pointer;">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </span>
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input ribbon-checkbox" type="checkbox" id="ribbon_@ribbon.UniqueGUID" />
+                                                <label class="form-check-label" for="ribbon_@ribbon.RibbonID">Ribbon-@ribbon.RibbonID</label>
+                                            </div>
+                                        </div>
+
+                                        @if (hasRibbonFibers)
+                                        {
+                                            <ul class="child">
+                                                @foreach (var fiber in ribbon.Fibers)
+                                                {
+                                                    <li>
+                                                        <div class="form-check mb-0">
+                                                            <input class="form-check-input fiber-checkbox" type="checkbox" value="@fiber.UniqueGUID" id="fiber_@fiber.UniqueGUID" />
+                                                            <label class="form-check-label" for="fiber_@fiber.UniqueGUID">
+                                                                Fiber-@fiber.FiberID (@fiber.CircuitID)
+                                                                @if (fiber.HasMultipleCircuits)
+                                                                {
+                                                                    <span class="badge bg-warning text-dark ms-2">Shared</span>
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        </li>
+    </ul>
+}

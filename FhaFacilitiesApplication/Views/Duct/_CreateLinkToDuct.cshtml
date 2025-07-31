@@ -1,0 +1,72 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+<div class="modal-content">
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">Link Cable to Duct</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "linkDuctForm" }))
+    {
+        @Html.HiddenFor(m => m.CableDuctBindingViewModel.CableDuctGuid)
+
+        <div class="modal-body pb-0">
+            <h5 class="mb-4 fw-semibold">@Model.CableDuctBindingViewModel?.CableID</h5>
+
+            <div class="row g-4">
+                <!-- Conduit Dropdown -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.CableDuctBindingViewModel.SelectedConduitGuid, "Select Conduit Path", new { @class = "form-label" })
+                    @Html.DropDownListFor(
+                             m => m.CableDuctBindingViewModel.SelectedConduitGuid,
+                             new SelectList(Model.CableDuctBindingViewModel.ConduitDropdownList, "Value", "Text", Model.CableDuctBindingViewModel.SelectedConduitGuid),
+                             "Select Conduit",
+                             new { @class = "form-select", id = "ddlLinkDuctConduit" }
+                             )
+                    @Html.ValidationMessageFor(m => m.CableDuctBindingViewModel.SelectedConduitGuid, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Duct Dropdown -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.CableDuctBindingViewModel.SelectedDuctGuid, "Select Duct", new { @class = "form-label" })
+                    @Html.DropDownListFor(
+                             m => m.CableDuctBindingViewModel.SelectedDuctGuid,
+                             new SelectList(Model.CableDuctBindingViewModel.DuctDropdownList, "Value", "Text", Model.CableDuctBindingViewModel.SelectedDuctGuid),
+                             "Select Duct",
+                             new { @class = "form-select", id = "ddlLinkDuct" }
+                             )
+                    @Html.ValidationMessageFor(m => m.CableDuctBindingViewModel.SelectedDuctGuid, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- SubDuct Dropdown (conditionally enabled) -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.CableDuctBindingViewModel.SelectedSubDuctGuid, "Select SubDuct", new { @class = "form-label" })
+                    @Html.DropDownListFor(
+                             m => m.CableDuctBindingViewModel.SelectedSubDuctGuid,
+                             new SelectList(Model.CableDuctBindingViewModel.SubDuctDropdownList, "Value", "Text", Model.CableDuctBindingViewModel.SelectedSubDuctGuid),
+                             "Select SubDuct",
+                             new
+                             {
+                                 @class = "form-select",
+                                 id = "ddlLinkDuctSubDuct",
+                                 disabled = Model.CableDuctBindingViewModel.IsSubDuctEnabled ? null : "disabled"
+                             }
+                             )
+                    @Html.ValidationMessageFor(m => m.CableDuctBindingViewModel.SelectedSubDuctGuid, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer border-0 gap-3">
+            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+            <button type="submit" id="btnLinkDuctSave" class="btn btn-primary">Save</button>
+        </div>
+    }
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#linkDuctForm");
+    });
+</script>

@@ -1,0 +1,114 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model.StructureViewModel != null && Model.StructureViewModel.UniqueId > 0;
+    var title = isEdit ? "Edit Structure" : "Add New Structure";
+    var buttonLabel = isEdit ? "Update" : "Add";
+    bool isDisabledStructureModel = Model.StructureViewModel.StructureModel == "Room";
+}
+
+<div class="modal-content">
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">@title</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "structureForm" }))
+    {
+        @Html.HiddenFor(m => m.StructureViewModel.UniqueId, new { id = "hdnStructureUniqueId" })
+        @Html.HiddenFor(m => m.StructureViewModel.UniqueGuid, new { id = "hdnStructureUniqueGuId" })
+
+        <div class="modal-body pb-0">
+            <div class="row g-4">
+
+                <!-- Structure Type -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.StructureViewModel.StructureType, "Structure Type", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.DropDownListFor(m => m.StructureViewModel.StructureType,
+                        Model.StructureViewModel.StructureTypeList,
+                        new { @class = "form-select", id = "ddlStructureType" })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.StructureType, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Location Description -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.StructureViewModel.LocationDescription, "Location Desc", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.DropDownListFor(m => m.StructureViewModel.LocationDescription,
+                        Model.StructureViewModel.LocationDescriptionList,
+                        new { @class = "form-select", id = "ddlLocationDescription" })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.LocationDescription, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Building ID -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.StructureViewModel.BuildingGuid, "Building ID", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.DropDownListFor(m => m.StructureViewModel.BuildingGuid,
+                        Model.StructureViewModel.BuildingOptions,
+                        "Select Building",
+                        new { @class = "form-select", id = "ddlBuildingID" })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.BuildingGuid, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Structure ID -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.StructureViewModel.StructureId, "Structure ID", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
+                    @Html.TextBoxFor(m => m.StructureViewModel.StructureId, new { @class = "form-control", id = "StructureId" })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.StructureId, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Structure Model -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.StructureViewModel.StructureModel, "Structure Model", new { @class = "form-label" })
+                     @Html.DropDownListFor(
+                    m => m.StructureViewModel.StructureModel,
+                    new SelectList(Model.StructureViewModel.StructureModelList, "Value", "Text"),
+                    "Select Structure Model",
+                    new {
+                        @class = "form-select",
+                        id = "ddlStructureModel",
+                        disabled = isDisabledStructureModel ? "disabled" : null
+                    }
+                )
+                @Html.ValidationMessageFor(m => m.StructureViewModel.StructureModel, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Latitude -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.StructureViewModel.Latitude, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.StructureViewModel.Latitude, new { @class = "form-control", id = "StructureLatitude" })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.Latitude, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Longitude -->
+                <div class="col-sm-6">
+                    @Html.LabelFor(m => m.StructureViewModel.Longitude, new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.StructureViewModel.Longitude, new { @class = "form-control", id = "StructureLongitude" })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.Longitude, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Comments -->
+                <div class="col-12">
+                    @Html.LabelFor(m => m.StructureViewModel.Comments, new { @class = "form-label" })
+                    @Html.TextAreaFor(m => m.StructureViewModel.Comments, new { @class = "form-control", id = "StructureComments", rows = 4 })
+                    @Html.ValidationMessageFor(m => m.StructureViewModel.Comments, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer border-0 gap-3">
+            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="btnSubmitStructure" class="btn btn-primary">@buttonLabel</button>
+        </div>
+    }
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#structureForm");
+    });
+</script>

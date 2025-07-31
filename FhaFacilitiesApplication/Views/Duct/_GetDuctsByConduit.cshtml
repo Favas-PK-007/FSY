@@ -1,0 +1,15 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.CableDuctBindingViewModel
+
+<option value="">Select Duct</option>
+
+@foreach (var item in Model.DuctDropdownList)
+{
+    if (item.Selected)
+    {
+        <option value="@item.Value" selected>@item.Text</option>
+    }
+    else
+    {
+        <option value="@item.Value">@item.Text</option>
+    }
+}

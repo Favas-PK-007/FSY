@@ -1,0 +1,79 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+<!-- Modal Header -->
+<div class="modal-header border-0">
+    <h6 class="modal-title fw-medium">Add SubDuct</h6>
+    <button type="button"
+            class="btn-close shadow-none"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body pb-0">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "subDuctForm" }))
+    {
+        @Html.HiddenFor(m => m.DuctViewModel.UniqueId, new { id = "hdnSubDuctUniqueId" })
+        @Html.HiddenFor(m => m.DuctViewModel.UniqueGuid, new { id = "hdnSubDuctUniqueGUID" })
+        @Html.HiddenFor(m => m.DuctViewModel.ConduitGuid, new { id = "hdnSubDuctConduitGuid" })
+        @Html.HiddenFor(m => m.DuctViewModel.ParentGuid, new { id = "hdnSubDuctParentGuid" })
+
+        <div class="row g-4">
+            <!-- Duct IDs -->
+            <div class="col-12">
+                @Html.LabelFor(m => m.DuctViewModel.DuctId, "Duct ID(s)", new { @class = "form-label" })
+                <div class="d-flex gap-3 duct-inputs">
+                    <div class="w-100">
+                        @Html.TextBoxFor(m => m.DuctViewModel.DuctId, new { @class = "form-control mb-4", id = "SubDuctId1" })
+                        @Html.TextBoxFor(m => m.DuctViewModel.DuctIdb, new { @class = "form-control", id = "SubDuctId2" })
+                    </div>
+                    <div class="d-flex flex-column flex-shrink-0">
+                        <label class="form-label mb-4">@("@" + Model.DuctViewModel.StructureA)</label>
+                        <label class="form-label mb-4">@("@" + Model.DuctViewModel.StructureB)</label>
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.DuctViewModel.DuctId, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Duct Type -->
+            <div class="col-12">
+                <label class="form-label">Duct Type</label>
+                <select class="form-select" id="ddlSubDuctType" name="DuctType">
+                    @if (Model.DuctViewModel.UniqueId == 0)
+                    {
+                        <option value="">-- Select Duct Type --</option>
+                    }
+
+                    @foreach (var item in Model.DuctViewModel.DuctTypesList)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+
+                @Html.ValidationMessageFor(m => m.DuctViewModel.DuctType, "", new { @class = "text-danger" })
+            </div>
+
+
+            <!-- Comments -->
+            <div class="col-12">
+                @Html.LabelFor(m => m.DuctViewModel.Comments, new { @class = "form-label" })
+                @Html.TextAreaFor(m => m.DuctViewModel.Comments, new { @class = "form-control", rows = 4, id = "txtSubDuctComments" })
+                @Html.ValidationMessageFor(m => m.DuctViewModel.Comments, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer border-0 gap-3">
+    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+        Close
+    </button>
+    <button type="button" id="btnSubmitSubDuct" class="btn btn-primary">Add Sub Duct</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#subDuctForm");
+    });
+</script>

@@ -1,0 +1,106 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "equipmentForm" }))
+{
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">Connect Fiber to Equipment</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @Html.HiddenFor(model => model.EquipmentViewModel.UniqueGUID, new { @id = "hdnEquipmentUniqueGuid" })
+    @Html.HiddenFor(model => model.EquipmentViewModel.SpliceGUID, new { @id = "hdnEquipmentSpliceGuid" })
+    @Html.HiddenFor(model => model.EquipmentViewModel.FiberA_GUID, new { @id = "hdnEquipmentFiberAGuid" })
+    @Html.HiddenFor(model => model.EquipmentViewModel.FiberB_GUID, new { @id = "hdnEquipmentFiberBGuid" })
+    @Html.HiddenFor(model => model.EquipmentViewModel.StructureGUID, new { @id = "hdnEquipmentStructureGuid" })
+    @Html.HiddenFor(model => model.EquipmentViewModel.TypeGUID, new { @id = "hdnEquipmentTypeGuid" })
+    @Html.HiddenFor(model => model.EquipmentViewModel.UniqueID, new { @id = "hdnEquipmentUniqueId" })
+
+    <div class="modal-body pb-0">
+        <div class="row g-4">
+            <!-- New Equipment Installation Checkbox -->
+            <div class="col-12">
+                <div class="form-check csv-format">
+                    @Html.CheckBoxFor(m => m.EquipmentViewModel.IsNewEquipment, new { @class = "form-check-input shadow-none", @id = "chkNewEquipment" })
+                    @Html.Label("chkNewEquipment", "New Equipment Installation?", new { @class = "form-check-label" })
+                </div>
+            </div>
+
+            <!-- Equipment ID Dropdown -->
+            <div class="col-sm-6" id="dropdownEquipmentIdContainer">
+                @Html.Label("ddlEquipmentId", "Equipment ID", new { @class = "form-label" })
+                @Html.DropDownList(
+                         "SelectedEquipmentId",
+                         Model.EquipmentViewModel.EquipmentIdList,
+                         "Select Equipment",
+                         new { @class = "form-select", @id = "ddlEquipmentId" }
+                         )
+            </div>
+
+
+            <!-- New Equipment ID Textbox (Hidden initially) -->
+            <div class="col-sm-6" id="textboxEquipmentId" style="display:none;">
+                @Html.Label("txtNewEquipmentId", "New Equipment ID", new { @class = "form-label" })
+                @Html.TextBox(
+                         "NewEquipmentId",
+                         "",
+                         new { @class = "form-control", @id = "txtNewEquipmentId" }
+                         )
+            </div>
+
+            <!-- Equipment Type -->
+            <div class="col-sm-6">
+                @Html.Label("ddlEquipmentType", "Equipment Type", new { @class = "form-label" })
+
+                @if ( Model.EquipmentViewModel.EquipmentTypeList.Any())
+                {
+                    @Html.DropDownListFor(
+                             model => model.EquipmentViewModel.SelectedEquipmentID,
+                             new SelectList(Model.EquipmentViewModel.EquipmentTypeList, "Value", "Text"),
+                             "Select Type", 
+                             new { @class = "form-select", @id = "ddlEquipmentType" }
+                             )
+                }
+                else
+                {
+                    @Html.DropDownListFor(
+                             model => model.EquipmentViewModel.SelectedEquipmentID,
+                             new List<SelectListItem>(), // empty dropdown
+                             new { @class = "form-select", @id = "ddlEquipmentType" }
+                             )
+                }
+            </div>
+
+
+
+            <!-- Equipment Model -->
+            <div class="col-sm-6" id="equipmentModelDropdownContainer">
+                @await Html.PartialAsync("_GetEquipmentModel", Model.EquipmentViewModel)
+            </div>
+
+
+            <!-- Port ID -->
+            <div class="col-sm-6" id="portDropdownContainer">
+                @await Html.PartialAsync("_GetPortId", Model.EquipmentViewModel)
+            </div>
+
+            <!-- Comments -->
+            <div class="col-12">
+                @Html.Label("txtEquipmentComments", "Comments", new { @class = "form-label" })
+                @Html.TextAreaFor(
+                         model => model.EquipmentViewModel.Comments,
+                         new { @class = "form-control", rows = 4, id = "txtEquipmentComments" })
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer border-0 gap-3">
+        <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="btnSaveEquipment">Add</button>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#equipmentForm");
+    });
+</script>

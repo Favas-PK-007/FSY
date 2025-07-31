@@ -1,0 +1,152 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model.SpliceViewModel != null && Model.SpliceViewModel.UniqueId > 0;
+    var title = isEdit ? "Edit Connection Enclosure" : "Add New Connection Enclosure";
+    var buttonLabel = isEdit ? "Update" : "Add";
+}
+
+<!-- Modal Header -->
+<div class="modal-header border-0">
+    <h6 class="modal-title fw-medium">@title</h6>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body pb-0">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "connectionEnclosureForm" }))
+    {
+        @Html.HiddenFor(m => m.SpliceViewModel.UniqueId, new { id = "hdnSpliceUniqueId" })
+        @Html.HiddenFor(m => m.SpliceViewModel.UniqueGuid, new { id = "hdnSpliceUniqueGUID" })
+
+        <div class="row g-4">
+            <div class="col-sm-6">
+                @Html.LabelFor(m => m.SpliceViewModel.SpliceType, "Installation Type", new { @class = "form-label" })
+                @Html.DropDownListFor(m => m.SpliceViewModel.SpliceType, Model.SpliceViewModel.InstallationTypeList, new { @class = "form-select", id = "SpliceInstallationType" })
+                @Html.ValidationMessageFor(m => m.SpliceViewModel.SpliceType, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="col-sm-6">
+                @Html.LabelFor(m => m.SpliceViewModel.SelectedStructureID, "Structure ID", new { @class = "form-label" })
+                @Html.DropDownListFor(m => m.SpliceViewModel.SelectedStructureID, Model.SpliceViewModel.StructureIdList, new { @class = "form-select", id = "SpliceStructureId" })
+                @Html.ValidationMessageFor(m => m.SpliceViewModel.SelectedStructureID, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="col-12">
+                @Html.LabelFor(m => m.SpliceViewModel.SpliceID, "Equipment ID", new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.SpliceViewModel.SpliceID, new { @class = "form-control", id = "SpliceEquipmentId" })
+                @Html.ValidationMessageFor(m => m.SpliceViewModel.SpliceID, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="col-sm-6">
+                @Html.LabelFor(m => m.SpliceViewModel.EquipmentTypeList, "Equipment Type", new { @class = "form-label" })
+                @Html.DropDownListFor(m => m.SpliceViewModel.EquipmentTypeList, Model.SpliceViewModel.EquipmentTypeList, "Select Equipment Type", new { @class = "form-select", id = "SpliceEquipmentType" })
+                @Html.ValidationMessageFor(m => m.SpliceViewModel.EquipmentTypeList, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="col-sm-6">
+                @Html.LabelFor(m => m.SpliceViewModel.EquipmentModelList, "Equipment Model", new { @class = "form-label" })
+                @Html.DropDownListFor(m => m.SpliceViewModel.EquipmentModelList, Model.SpliceViewModel.EquipmentModelList, new { @class = "form-select", id = "SpliceEquipmentModel" })
+                @Html.ValidationMessageFor(m => m.SpliceViewModel.EquipmentModelList, "", new { @class = "text-danger" })
+            </div>
+
+            @Html.LabelFor(m => m.SpliceViewModel.Components, "Components", new { @class = "form-label" })
+            <div class="tree-view-container">
+                <ul class="tree-view">
+                    <!-- Root: Trays -->
+                    <li>
+                        <div class="d-flex align-items-center" id="toggleTrayList" style="cursor: pointer;">
+                            <span class="indicator me-1">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                            <label class="fw-normal mb-0">Trays</label>
+                        </div>
+
+                        <!-- Tray List -->
+                        <ul id="trayList" class="collapse">
+                            @if (Model.SpliceViewModel.Components != null && Model.SpliceViewModel.Components.Any())
+                            {
+                                @foreach (var tray in Model.SpliceViewModel.Components)
+                                {
+                                    var hasChildren = tray.Children != null && tray.Children.Any();
+
+                                    <li>
+                                        <div class="d-flex align-items-start gap-1">
+                                            @if (hasChildren)
+                                            {
+                                                <span class="indicator" style="cursor:pointer;">
+                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="indicator invisible">
+                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                </span>
+                                            }
+
+                                            <input type="radio" name="SelectedComponent" id="trayRadio" value="@tray.UniqueGUID" />
+                                            <label for="tray_@tray.UniqueGUID">
+                                                @tray.MaterialType - @tray.MaterialID (@tray.ModelID)
+                                            </label>
+                                        </div>
+
+                                        @if (hasChildren)
+                                        {
+                                            <ul class="child" style="display: none;">
+                                                @foreach (var module in tray.Children)
+                                                {
+                                                    <li>
+                                                        <input type="radio" name="SelectedComponent" id="module_@module.UniqueGUID" value="@module.ModelID" />
+                                                        <label for="module_@module.UniqueGUID">
+                                                            @module.MaterialType - @module.MaterialID (@module.ModelID)
+                                                        </label>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="d-flex gap-2 mt-3 add-edit-btns">
+                <button type="button" class="btn add" title="Add Component" id="btnAddComponent">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" class="btn delete" title="Delete Component" id="btnDeleteComponent">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+            <div class="col-12">
+                @Html.LabelFor(m => m.SpliceViewModel.Comments, "Comments", new { @class = "form-label" })
+                @Html.TextAreaFor(m => m.SpliceViewModel.Comments, new { @class = "form-control", rows = 3, id = "SpliceComments" })
+                @Html.ValidationMessageFor(m => m.SpliceViewModel.Comments, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer border-0 gap-3">
+    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+    <button type="button" id="btnSubmitSplice" class="btn btn-primary">@buttonLabel</button>
+</div>
+
+<div class="modal fade" id="addComponentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <!-- Partial will be loaded here -->
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#connectionEnclosureForm");
+    });
+</script>

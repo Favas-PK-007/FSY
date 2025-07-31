@@ -1,0 +1,21 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.EquipmentViewModel
+
+@Html.Label("ddlPortId", "Port ID", new { @class = "form-label" })
+
+@if (Model.EquipmentPortIdList != null && Model.EquipmentPortIdList.Any())
+{
+    @Html.DropDownList(
+                "ddlPortId", 
+                Model.EquipmentPortIdList,
+                "Select Port",
+                new { @class = "form-select", @id = "ddlPortId" }
+            )
+}
+else
+{
+    @Html.DropDownList(
+                "ddlPortId",
+                new List<SelectListItem>(),
+                new { @class = "form-select", @id = "ddlPortId", disabled = "disabled" }
+            )
+}

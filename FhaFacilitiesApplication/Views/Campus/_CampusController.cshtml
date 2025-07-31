@@ -1,0 +1,79 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+@{
+    bool hasData = Model.Campuses != null && Model.Campuses.Any();
+}
+
+<div class="title d-flex justify-content-between align-items-center gap-3 pb-3">
+    <h6 class="mb-0">Select Campus</h6>
+    <div class="d-flex gap-2 add-edit-btns">
+        <button class="btn delete"
+                data-rel="tooltip"
+                id="btnDeleteCampus"
+                title="Delete"
+                disabled>
+            <i class="fa-solid fa-trash"></i>
+        </button>
+        <button class="btn edit" data-rel="tooltip" title="Edit" id="btnEditCampus" disabled>
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button class="btn add"
+                id="btnAddCampus"
+                data-rel="tooltip"
+                title="Add">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+</div>
+
+@if (hasData)
+{
+    <div class="form-check-list">
+        @foreach (var campus in Model?.Campuses!)
+        {
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="radio"
+                       value="@campus.UniqueId"
+                       name="campusRadio"
+                       data-unique-guid="@campus.UniqueGUID"
+                       id="campus_@campus.UniqueId" />
+                <label class="form-check-label" for="campus_@campus.UniqueId">
+                    @campus.CampusId (@campus.Designation)
+                </label>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="no-data h-100">
+        <div class="d-flex justify-content-center align-items-center flex-column gap-4 text-center p-3 h-100">
+            <img src="./images/no-data.png"
+                 class="img-fluiid"
+                 alt="No Data" />
+            <p class="mb-0">Select a campus to see available buildings</p>
+        </div>
+    </div>
+}
+<div class="modal fade" id="delete-campus-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable delete-modal modal-lg">
+        <div class="modal-content py-4">
+            <div class="modal-body text-center">
+                <img src="./images/delete.png" class="img-fluid mb-4" alt="Delete" />
+                <h6 class="mb-3 fw-medium">
+                    Are you sure you want to delete this item?
+                </h6>
+                <p class="mb-4">
+                    This action cannot be undone. The item will be permanently removed.
+                </p>
+
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" id="btnDeleteCampusProceed" class="btn btn-red-2">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

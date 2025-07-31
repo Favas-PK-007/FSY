@@ -1,0 +1,181 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+
+<!-- Modal Header -->
+<div class="modal-header border-0">
+    <h6 class="modal-title fw-medium">Add/Edit Connection</h6>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body pb-0">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "connectionForm" }))
+    {
+
+        <div class="row">
+            <div class="col-xl-5">
+                <div class="row g-4 h-100">
+                    <div class="col-sm-6 d-flex flex-column h-100">
+                        @Html.Label("","Select Cable A", htmlAttributes: new { @class = "form-label" })
+                        <select class="form-select mb-3" id="ddlCableA" name="CableA">
+                            <option value="">Select Cable A</option>
+                            @foreach (var item in Model.ConnectionListingViewModel.CableAList ?? new List<SelectListItem>())
+                            {
+                                <option value="@item.Value" selected="@(item.Selected ? "selected" : null)">@item.Text</option>
+                            }
+                        </select>
+
+                        <p>Available Fibers in Cable ‘A’ for Splicing</p>
+                        <div id="fiberTreeAContainer" class="tree-view-container h-100">
+
+                            @{
+                                await Html.RenderPartialAsync("~/views/Cable/_GetFiberTree.cshtml", Model);
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-6 d-flex flex-column h-100">
+                        @Html.Label("","Select Cable B", htmlAttributes: new { @class = "form-label" })
+                        <select class="form-select mb-3" id="ddlCableB" name="CableB">
+                            <option value="">Select Cable B</option>
+                            @foreach (var item in Model.ConnectionListingViewModel.CableBList ?? new List<SelectListItem>())
+                            {
+                                <option value="@item.Value" selected="@(item.Selected ? "selected" : null)">@item.Text</option>
+                            }
+                        </select>
+
+                        <p>Available Fibers in Cable ‘B’ for Splicing</p>
+                        <div id="fiberTreeBContainer" class="tree-view-container h-100">
+                            @{
+                                await Html.RenderPartialAsync("~/views/Cable/_GetFiberTree.cshtml", Model);
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-7 d-flex flex-column flex-xl-row gap-3 gap-xl-4 align-items-start">
+                <div class="move-btns d-flex flex-xl-column flex-shrink-0 gap-3 mt-4 my-xl-auto mx-auto mx-xl-0">
+                    <button type="button" id="btnMoveRight" class="btn"><i class="fa-solid fa-arrow-right"></i></button>
+                    <button type="button" id="btnMoveLeft" class="btn"><i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <div class="d-flex flex-column w-100 h-100">
+                    <div class="splicing-head d-flex justify-content-between align-items-center gap-3 flex-shrink-0">
+                        <h4 class="mb-0">@Model.ConnectionListingViewModel.Title</h4>
+                        <button type="button" class="btn btn-outline-3 d-none d-xl-flex" id="btnExportReport">
+                            Export Report
+                        </button>
+                    </div>
+
+                    <p>Select Available Slot to Start Splicing From</p>
+                    <div class="splicing-table h-100">
+                        <div class="table-responsive">
+                            <table class="table mb-0" id="tblSplicingSlots">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>@Model.ConnectionListingViewModel.Column0Header</th>
+                                        <th>@Model.ConnectionListingViewModel.Column1Header</th>
+                                        <th>@Model.ConnectionListingViewModel.Column2Header</th>
+                                        <th>@Model.ConnectionListingViewModel.Column3Header</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.ConnectionListingViewModel.Slots != null && Model.ConnectionListingViewModel.Slots.Any())
+                                    {
+                                        @foreach (var slot in Model.ConnectionListingViewModel.Slots)
+                                        {
+                                            var rowId = $"row_slot_{slot.SlotNumber}";
+                                            var radioId = $"slot_radio_{slot.SlotNumber}";
+
+                                            <tr id="@rowId">
+                                                <td>
+                                                    <input class="form-check-input"
+                                                           type="radio"
+                                                           id="@radioId"
+                                                           name="SelectedSlotId"
+                                                           value="@slot.SlotNumber"
+                                                           data-connection-guid="@slot.ConnectionTypeGUID" />
+
+                                                </td>
+                                                <td>@slot.TrayLabel</td>
+                                                <td>@slot.SlotLabel</td>
+                                                <td>@slot.ConnectionType</td>
+                                                <td style="white-space: pre-line;">@slot.FiberDetails</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No slots available</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mt-4 d-xl-none gap-3 flex-wrap align-items-center">
+                        <div class="form-check csv-format">
+                            <input class="form-check-input shadow-none" type="checkbox" id="chkCSVFormat" />
+                            <label class="form-check-label" for="chkCSVFormat">CSV Format?</label>
+                        </div>
+                        <button type="button" class="btn btn-outline">Trace Fiber</button>
+                        <button type="button" id="btnAddEquipment" class="btn btn-outline" data-bs-toggle="modal" >
+                            Add Equipment
+                        </button>
+                        <button class="btn btn-outline">Edit Equipment</button>
+                        <button class="btn btn-outline">Remove Equipment</button>
+                        <button class="btn btn-outline-3 d-flex d-xl-none"> Export Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer border-0 gap-3 justify-content-xl-between">
+    <div class="d-none d-xl-flex gap-3 flex-wrap align-items-center">
+        <div class="form-check csv-format">
+            <input class="form-check-input shadow-none" type="checkbox" id="chkCSVFormatFooter" />
+            <label class="form-check-label" for="chkCSVFormatFooter">CSV Format?</label>
+        </div>
+        <button type="button" class="btn btn-outline-2" data-bs-toggle="modal" data-bs-target="#trace-complete">Trace Fiber</button>
+        <button type="button" id="btnAddEquipment" class="btn btn-outline">
+            Add Equipment
+        </button>
+        <button class="btn btn-outline">Edit Equipment</button>
+        <button class="btn btn-outline">Remove Equipment</button>
+    </div>
+
+    <div class="d-flex gap-3 flex-wrap">
+        <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
+        <button type="button" id="btnSubmitConnection" class="btn btn-primary">Save</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#connectionForm");
+    });
+</script>
+
+
+<div class="modal fade" id="export-confirm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <div class="modal-body text-center">
+                <h6 class="mb-4 fw-medium">Save Port Assignments to File?</h6>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnConfirmExport" class="btn btn-primary">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

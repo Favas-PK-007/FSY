@@ -1,0 +1,25 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Add Component</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+@Html.HiddenFor(m => m.ComponentViewModel.MaterialType, new { id = "hdnMaterialType" })
+
+<div class="modal-body">
+    <div class="mb-3">
+        <label for="ComponentModel" class="form-label">Component Model</label>
+        <select id="ComponentModel" name="ComponentModel" class="form-select">
+            @foreach (var item in Model.ComponentViewModel.ComponentModelList)
+            {
+                <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+            }
+        </select>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="mx-3 btn btn-gray" data-bs-dismiss="modal">Close</button>
+    <button type="button" id="btnSaveComponent" class="btn btn-primary">Save</button>
+</div>

@@ -1,0 +1,519 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Fraser Health";
+    bool hasData = Model.Campuses != null && Model.Campuses.Any();
+}
+
+<section class="home container-fluid">
+    <div class="row h-100 pe-xl-3">
+        <div class="col-xl-3 home-box blue p-3">
+            <header class="d-flex justify-content-between align-items-center">
+                <img src="./images/logo.png" alt="Fraser Health Logo" />
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline" disabled
+                            data-rel="tooltip"
+                            title="Reload"
+                            data-bs-placement="bottom">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                    <button id="btnEditMaterials"
+                            class="btn btn-secondary" 
+                            data-rel="tooltip"
+                            title="Edit Materials"
+                            data-bs-placement="bottom">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button id="btnAddMaterials"
+                            class="btn btn-green"
+                            data-rel="tooltip"
+                            title="Add Materials"
+                            data-bs-placement="bottom">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                </div>
+            </header>
+            <div class="card-white" id="campusControllerDiv">
+                @{
+                    await Html.RenderPartialAsync("~/views/Campus/_CampusController.cshtml", Model);
+                }
+            </div>
+        </div>
+
+        <div class="col-xl-3 home-box p-3 pb-0 pb-xl-3 pe-xl-0">
+            <div class="card-white" id="buildingController">
+              @* Building dropdown list *@
+            </div>
+            <div class="card-white" id="structureController">
+                @* Structure radio button list *@
+            </div>
+        </div>
+
+        <div class="col-xl-3 home-box p-3 pb-0 pb-xl-3 pe-xl-0">
+            <div class="card-white" id="conduitPathController">
+                @* conduitPath radio button list *@
+            </div>
+
+            <div class="card-white">
+                <div id="SpliceController" class="d-flex flex-column h-100 overflow-hidden">
+                    @* Connection Encloser radio button list *@
+                </div>
+                <div class="btns">
+                    <button id="btnViewConnection" disabled
+                            class="btn btn-outline" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#view-connections">
+                        <i class="fa-solid fa-sitemap"></i> View Connections
+                    </button>
+                    <button class="btn btn-outline-2"  disabled
+                            id="btnViewCircuits"
+                            data-bs-toggle="modal"
+                            data-bs-target="#view-circuits">
+                        <i class="fa-solid fa-bolt-lightning"></i>View Circuits
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 home-box p-3 pe-xl-0">
+            <div class="card-white" id="ductController">
+                @* Duct radio button list *@
+            </div>
+
+            <div class="card-white">
+                <div id="cableController" class="d-flex flex-column  h-100 overflow-hidden">
+                    @* Cable radio button list *@
+                </div>
+                <div class="btns">
+                    <button class="btn btn-outline-2" id="btnLinkToDuct" disabled
+                            data-bs-toggle="modal"
+                            data-bs-target="#link-duct">
+                        <i class="fa-solid fa-link"></i> Link to Duct
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="addMaterialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+        <div class="modal-content" id="addMaterialModelContainer">
+        </div>
+    </div>
+</div>
+<!-- add-materials -->
+
+<div class="modal fade" id="addCampusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addCampusModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+<!-- add-campus -->
+
+
+
+<div class="modal fade" id="addBuildingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addBuildingModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+<!-- add-building -->
+
+<div class="modal fade" id="addStructureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addStructureModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+<!-- add-structure -->
+
+<div class="modal fade" id="addConduitPathModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addConduitPathModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+<!-- add-conduit -->
+
+<div class="modal fade" id="addDuctModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addDuctModelContainer">
+        </div>
+    </div>
+</div>
+<!-- add-duct -->
+
+<!-- Add sub duct-->
+
+<div class="modal fade" style="left:60px" id="addSubDuctModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addSubDuctModelContainer">
+        </div>
+    </div>
+</div>
+
+
+<!-- Add sub duct-->
+
+<div class="modal fade" id="addConnectionEnclosureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addConnectionEnclosureModelContainer">
+            <p>Loading...</p>
+        </div>
+    </div>
+</div>
+<!-- add-enclosure -->
+
+<div class="modal fade" id="addCableModel" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addCableModelContainer">
+        </div>
+    </div>
+</div>
+<!-- add-cable -->
+
+<div class="modal fade"
+     id="viewConnectionsModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable connections-modal">
+        <div class="modal-content" id="viewConnectionsModalContainer">
+        </div>
+    </div>
+</div>
+<!-- view-connections -->
+
+<div class="modal fade" id="trace-complete" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg trace-modal">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h6 class="modal-title fw-medium">Trace Complete</h6>
+                <button type="button"
+                        class="btn-close shadow-none"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body pb-0">
+                <div class="d-flex gap-3 align-items-center success-msg py-2 ps-2 mb-4">
+                    <span>
+                        <img src="./images/check.png" class="img-fluid" alt="success" />
+                    </span>
+                    <p class="mb-0">Trace Completed</p>
+                </div>
+                <table class="table table-bordered">
+                    <tr>
+                        <td>RACT-B1A-R1.FP1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-W1/RACT-B1A-R1-FP1.1-6.1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-R1.FP1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-W1/RACT-B1A-R1-FP1.1-6.1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-R1.FP1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-W1/RACT-B1A-R1-FP1.1-6.1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-R1.FP1.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>RACT-B1A-W1/RACT-B1A-R1-FP1.1-6.1.1.1</td>
+                    </tr>
+                </table>
+                <p class="mb-0">
+                    There are <strong>5 Fiber Segments</strong> in the Trace
+                </p>
+            </div>
+            <div class="modal-footer border-0 gap-3">
+                <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- trace-complete -->
+
+<div class="modal fade" id="addEquipmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content" id="addEquipmentModalContainer">
+@*             <div class="modal-header border-0">
+                <h6 class="modal-title fw-medium">Connect Fiber to Equipment</h6>
+                <button type="button"
+                        class="btn-close shadow-none"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body pb-0">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="form-check csv-format">
+                            <input class="form-check-input shadow-none"
+                                   type="checkbox"
+                                   value=""
+                                   id="csv" />
+                            <label class="form-check-label" for="csv">
+                                New Equipment Installation?
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Equipment ID</label>
+                        <select class="form-select">
+                            <option></option>
+                            <option></option>
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Equipment Type</label>
+                        <select class="form-select">
+                            <option></option>
+                            <option></option>
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Equipment Model</label>
+                        <select class="form-select">
+                            <option></option>
+                            <option></option>
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Port ID</label>
+                        <select class="form-select">
+                            <option></option>
+                            <option></option>
+                            <option></option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Comments</label>
+                        <textarea class="form-control" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 gap-3">
+                <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary">Add</button>
+            </div> *@
+        </div>
+    </div>
+</div>
+<!-- add-equipment -->
+
+<div class="modal fade" id="circuitListModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable circuits-modal">
+        <div class="modal-content" id="circuitListContainer">
+@*             <div class="modal-header border-0">
+                <h6 class="modal-title fw-medium">Add/Edit Circuits</h6>
+                <button type="button"
+                        class="btn-close shadow-none"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body pb-0">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="row g-4">
+                            <div class="col-sm-6 col-lg-12">
+                                <label class="form-label">Select Building</label>
+                                <select class="form-select">
+                                    <option></option>
+                                    <option></option>
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 col-lg-12">
+                                <label class="form-label">Select Splice Location</label>
+                                <select class="form-select">
+                                    <option></option>
+                                    <option></option>
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 col-lg-12">
+                                <label class="form-label">Select Cable</label>
+                                <select class="form-select">
+                                    <option></option>
+                                    <option></option>
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 col-lg-12">
+                                <label class="form-label">Reserved for Building</label>
+                                <select class="form-select">
+                                    <option></option>
+                                    <option></option>
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">CircuitID/Description (Max. 250 characters)</label>
+                                <textarea class="form-control" rows="4"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Comments</label>
+                                <textarea class="form-control" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 d-flex flex-column flex-lg-row gap-3 gap-lg-4 align-items-start">
+                        <div class="move-btns d-flex flex-lg-column flex-shrink-0 gap-3 my-lg-auto mx-auto mx-lg-0">
+                            <button class="btn">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button class="btn">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex flex-column h-100 w-100">
+                            <div class="d-flex justify-content-between gap-2 flex-wrap mb-3">
+                                <label class="form-label mb-0">Fibers in Selected Cable</label>
+                                <p class="mb-0 fst-italic">
+                                    * Denotes an available Backup Circuit
+                                </p>
+                            </div>
+                            <div class="tree-view-container h-100">
+                                <ul class="tree-view">
+                                    <li>
+                                        <input class="form-check-input" type="checkbox" />
+                                        <label>RACT-B1A-W1/RACT-B1A-R1-FP1-1-6</label>
+
+                                        <ul>
+                                            <li>
+                                                <input class="form-check-input" type="checkbox" />
+                                                <label>Buffer-2</label>
+                                                <ul>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <input class="form-check-input" type="checkbox" />
+                                                <label>Buffer-1</label>
+                                                <ul>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                    <li>
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label>Ribbon-1</label>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 gap-3">
+                <div class="d-flex gap-3 flex-wrap">
+                    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-secondary">Reload</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div> *@
+        </div>
+    </div>
+</div>
+<!-- view-circuits div -->
+
+<div class="modal fade" id="addLinkDuctModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
+        <div class="modal-content" id="addLinkDuctModalContainer">
+            <!-- Loader Partial -->
+            <div id="linkDuctLoaderTemplate" class="d-none">
+                <div class="d-flex justify-content-center align-items-center p-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Partial -->
+            <div id="linkDuctErrorTemplate" class="d-none">
+                <div class="p-3 text-danger">Failed to load link duct form. Please try again.</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="~/js/dashboard.js"></script>
+<script src="~/js/campus.js"></script>
+<script src="~/js/building.js"></script>
+<script src="~/js/structure.js"></script>
+<script src="~/js/conduit-path.js"></script>
+<script src="~/js/duct.js"></script>
+<script src="~/js/splice.js"></script>
+<script src="~/js/cable.js"></script>
+<script src="~/js/material.js"></script>
+<script src="~/js/circuit.js"></script>
+<script src="~/js/equipment.js"></script>

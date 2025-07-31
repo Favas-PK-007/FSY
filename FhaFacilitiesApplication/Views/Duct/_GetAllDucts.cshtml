@@ -1,0 +1,76 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+@{
+    bool hasData = Model.Ducts != null && Model.Ducts.Any();
+}
+
+<div class="title d-flex justify-content-between align-items-center gap-3 pb-3">
+    <h6 class="mb-0">
+        <span><i class="fa-solid fa-table-cells"></i></span> Duct
+    </h6>
+    <div class="d-flex gap-2 add-edit-btns">
+        <button id="btnDeleteDuct" class="btn delete" data-rel="tooltip" title="Delete" disabled>
+            <i class="fa-solid fa-trash"></i>
+        </button>
+        <button id="btnEditDuct" class="btn edit" data-rel="tooltip" title="Edit" disabled>
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button id="btnAddDuct" class="btn add"
+                data-rel="tooltip"
+                title="Add" disabled>
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+</div>
+
+@if (hasData)
+{
+    <div class="form-check-list">
+        @foreach (var duct in Model?.Ducts!)
+        {
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="radio"
+                       value="@duct.UniqueId"
+                       name="ductRadio"
+                       data-unique-guid="@duct.UniqueGuid"
+                       id="duct_@duct.UniqueId" />
+                <label class="form-check-label" for="duct_@duct.UniqueId">
+                    @duct.DisplayName
+                </label>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="no-data h-100">
+        <div class="d-flex justify-content-center align-items-center flex-column gap-4 text-center p-3 h-100">
+            <img src="./images/no-data.png"
+                 class="img-fluiid"
+                 alt="No Data" />
+            <p class="mb-0">Select a conduit path to see available duct</p>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="delete-Duct-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable delete-modal modal-lg">
+        <div class="modal-content py-4">
+            <div class="modal-body text-center">
+                <img src="./images/delete.png" class="img-fluid mb-4" alt="Delete" />
+                <h6 class="mb-3 fw-medium">
+                    Are you sure you want to delete this item?
+                </h6>
+                <p class="mb-4">
+                    This action cannot be undone. The item will be permanently removed.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" id="btnDeleteDuctProceed" class="btn btn-red-2">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

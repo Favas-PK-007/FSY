@@ -1,0 +1,127 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "viewCircuitForm" }))
+{
+    <div class="modal-header border-0">
+        <h6 class="modal-title fw-medium">Add/Edit Circuits</h6>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    @Html.HiddenFor(model => model.CircuitViewModel.SerializedModel, new { @id = "hdnCircuitModel" })
+
+    <!-- Scrollable Modal Body -->
+    <div class="modal-body pb-0" style="max-height: 70vh; overflow-y: auto;">
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-4">
+                <div class="row g-4">
+                    <!-- Building -->
+                    <div class="col-sm-6 col-lg-12">
+                        @Html.Label("ddlCircuitBuildingList", "Select Building", new { @class = "form-label" })
+                        <select id="ddlCircuitBuildingList" name="CircuitViewModel.BuildingGUID" class="form-select">
+                            <option value="">Select Building</option>
+                            @foreach (var building in Model.CircuitViewModel.BuildingList)
+                            {
+                                <option value="@building.UniqueGUID">@building.BuildingId</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Splice Location -->
+                    <div class="col-sm-6 col-lg-12" id="circuitSpliceLocationContainer">
+                        @await Html.PartialAsync("_GetSplicesByBuilding", Model.CircuitViewModel)
+                    </div>
+
+                    <!-- Cable -->
+                    <div class="col-sm-6 col-lg-12" id="circuitCableContainer">
+                        @await Html.PartialAsync("_GetCableBySplice", Model.CircuitViewModel)
+                    </div>
+
+                    <!-- Reserved Building -->
+                    <div class="col-sm-6 col-lg-12">
+                        @Html.Label("ddlReservedBuilding", "Reserved for Building", new { @class = "form-label" })
+                        <select id="ddlReservedBuilding" name="CircuitViewModel.ReservedBuildingGUID" class="form-select">
+                            <option value="">Select Reserved for Building</option>
+                            @foreach (var rb in Model.CircuitViewModel.BuildingReservedList)
+                            {
+                                <option value="@rb.UniqueGUID" data-uniqueid="@rb.UniqueId">@rb.BuildingId</option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        @Html.Label("txtCircuitDescription", "CircuitID/Description (Max. 250 characters)", new { @class = "form-label" })
+                        <textarea class="form-control" id="txtCircuitDescription" name="CircuitViewModel.CircuitDescription" rows="4" maxlength="250">@Model.CircuitViewModel.CircuitDescription</textarea>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="col-12">
+                        @Html.Label("txtCircuitComments", "Comments", new { @class = "form-label" })
+                        <textarea class="form-control" id="txtCircuitComments" name="CircuitViewModel.Comments" rows="4">@Model.CircuitViewModel.Comments</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-8 d-flex flex-column flex-lg-row gap-3 gap-lg-4 align-items-start">
+                <!-- Move Buttons -->
+                <div class="move-btns d-flex flex-lg-column flex-shrink-0 gap-3 my-lg-auto mx-auto mx-lg-0">
+                    <button type="button" class="btn" id="btnMoveRight"><i class="fa-solid fa-arrow-right"></i></button>
+                    <button type="button" class="btn" id="btnMoveLeft"><i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <!-- Tree View -->
+                <div class="d-flex flex-column h-100 w-100">
+                    <div class="d-flex justify-content-between gap-2 flex-wrap mb-3">
+                        <label class="form-label mb-0">Fibers in Selected Cable</label>
+                        <p class="mb-0 fst-italic">* Denotes an available Backup Circuit</p>
+                    </div>
+                    <div class="tree-view-container h-100" id="fiberTreeViewContainer">
+                        @await Html.PartialAsync("_GetFibersByCable", Model.CircuitViewModel)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer border-0 gap-3">
+        <div class="d-flex gap-3 flex-wrap">
+            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" id="btnReloadFiberTree">Reload</button>
+            <button type="button" class="btn btn-primary" id="btnSaveViewCircuit">Save</button>
+        </div>
+    </div>
+}
+
+
+<div class="modal fade" id="fiber-assignment-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content py-4">
+            <div class="modal-body text-center">
+                <img src="./images/info.png" class="img-fluid mb-4" alt="Information" />
+                <h6 class="mb-3 fw-medium text-primary">
+                    Notice
+                </h6>
+                <p class="mb-4">
+                    Please assign the selected fiber(s) to a building before proceeding with the reservation.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <button type="button" id="btnAcknowledgeFiberWarning" class="btn btn-primary" data-bs-dismiss="modal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#viewCircuitForm");
+    });
+</script>

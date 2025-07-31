@@ -1,0 +1,68 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+
+@if (Model?.ConnectionListingViewModel.CableAFiberTree?.Buffers?.Any() == true)
+{
+    <ul class="tree-view">
+        <li>
+            <div class="d-flex align-items-center" id="toggleFiberRoot" style="cursor: pointer;">
+                <span class="indicator me-1" id="toggleBufferList">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </span>
+                <label class="fw-normal mb-0">@Model.ConnectionListingViewModel.CableAFiberTree.CableID</label>
+            </div>
+
+            <ul id="bufferList" style="display: none;">
+                @foreach (var buffer in Model.ConnectionListingViewModel.CableAFiberTree.Buffers)
+                {
+                    var hasRibbons = buffer.Ribbons?.Any() == true;
+
+                    <li>
+                        <div class="d-flex align-items-start gap-1">
+                            <span class="indicator @(hasRibbons ? "" : "invisible")" id="toggleRibbonList" style="cursor: pointer;">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                            <input type="checkbox" class="buffer-checkbox form-check-input mt-1" data-guid="@buffer.UniqueGUID" />
+                            <label class="mb-0">@buffer.BufferID</label>
+                        </div>
+
+                        @if (hasRibbons)
+                        {
+                            <ul id="ribbonList" style="display: none;">
+                                @foreach (var ribbon in buffer.Ribbons)
+                                {
+                                    var hasFibers = ribbon.Fibers?.Any() == true;
+
+                                    <li>
+                                        <div class="d-flex align-items-start gap-1">
+                                            <span class="indicator @(hasFibers ? "" : "invisible")" id="toggleFiberList" style="cursor: pointer;">
+                                                <i class="fa-solid fa-chevron-right"></i>
+                                            </span>
+                                            <input type="checkbox" class="ribbon-checkbox form-check-input mt-1" data-guid="@ribbon.UniqueGUID" />
+                                            <label class="mb-0">@ribbon.RibbonID</label>
+                                        </div>
+
+                                        @if (hasFibers)
+                                        {
+                                            <ul id="fiberList" style="display: none;">
+                                                @foreach (var fiber in ribbon.Fibers)
+                                                {
+                                                    <li>
+                                                        <div class="d-flex align-items-start gap-1">
+                                                            <input type="checkbox" class="fiber-checkbox form-check-input mt-1" data-guid="@fiber.UniqueGUID" />
+                                                            <label class="mb-0">@fiber.FiberID</label>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        </li>
+    </ul>
+}

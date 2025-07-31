@@ -1,66 +1,25 @@
-﻿#region Namespaces
-using FhaFacilitiesApplication.Domain.Models;
-using FhaFacilitiesApplication.Domain.Services;
+﻿using FhaFacilitiesApplication.Domain.Services;
 using FhaFacilitiesApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-#endregion
+using System.Threading.Tasks;
 
 namespace FhaFacilitiesApplication.Controllers
 {
     public class DashboardController : Controller
     {
-        #region Declarations
-        private readonly ILogger<DashboardController> _logger;
         private readonly ICampusService _campusService;
-        #endregion
-
-        #region Constructor
-        public DashboardController(ILogger<DashboardController> logger, ICampusService campusService)
+        public DashboardController(ICampusService campusService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _campusService = campusService ?? throw new ArgumentNullException(nameof(campusService));
+            _campusService = campusService;
         }
-        #endregion
-
-        /// <summary>
-        /// Retrieves the list of campuses and returns the view with the campus list as the model.
-        /// </summary>
-        /// <returns>A View with the list of campuses.</returns>
-        public async Task<IActionResult> GetCampus()
+        public async Task<IActionResult> Index()
         {
-            //var campuses = await _campusService.GetCampusListAsync();
-            return View(); // Pass campus list to the view
-        }
-
-        #region AddCampus View
-        public IActionResult AddCampus()
-        {
-            return View(); // Return the view for adding a new campus
-        }
-        #endregion
-
-        #region AddCampus Post
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCampus(AddCampusViewModel model)
-        {
-            if(ModelState.IsValid)
+            var campuses = await _campusService.GetAllAsync();
+            var model = new DashboardViewModel
             {
-                // Save to database (map to entity and call service/repo)
-                var result = await _campusService.AddCampusAsync(model.ToModel());
-
-                TempData["CampusMessage"] = result;
-
-                // Return same view or redirect to the GetCampus view after insert
-                return RedirectToAction("AddCampus");
-            }
-
-            return View(model); // return view with validation errors
-            
+                Campuses = campuses.Select(x => CampusViewModel.FromModel(x)).ToList()
+            };
+            return View(model);
         }
-        #endregion
-
-
     }
 }

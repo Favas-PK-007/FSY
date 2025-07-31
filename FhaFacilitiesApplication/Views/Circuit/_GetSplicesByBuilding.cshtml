@@ -1,0 +1,19 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.CircuitViewModel
+
+<div class="mb-3">
+    @Html.Label("", "Select Splice Location", new { @class = "form-label" })
+    <select id="ddlCircuitSpliceLocation" name="SelectedSpliceLocationId" class="form-select">
+        @if (Model?.SpliceList != null && Model.SpliceList.Any())
+        {
+            <option value="">Select Splice Location</option>
+            @foreach (var item in Model.SpliceList)
+            {
+                <option value="@item.UniqueGuid">@item.SpliceID</option>
+            }
+        }
+        else
+        {
+            <option value=""></option>
+        }
+    </select>
+</div>

@@ -1,0 +1,17 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.CircuitViewModel
+
+@Html.Label("", "Select Cable", new { @class = "form-label" })
+<select id="ddlCircuitCable" name="SelectedCableId" class="form-select">
+    @if (Model?.CableList != null && Model.CableList.Any())
+    {
+        <option value="">Select Cable</option>
+        @foreach (var cable in Model.CableList)
+        {
+            <option value="@cable.UniqueGUID">@cable.CableID</option>
+        }
+    }
+    else
+    {
+        <option value=""></option>
+    }
+</select>

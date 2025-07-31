@@ -1,0 +1,151 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+
+@{
+    bool isEdit = Model != null && Model.DuctViewModel.UniqueId > 0;
+    var title = isEdit ? "Edit Duct" : "Add New Duct";
+    var buttonLabel = isEdit ? "Update" : "Add";
+}
+
+<!-- Modal Header -->
+<div class="modal-header border-0">
+    <h6 class="modal-title fw-medium">@title</h6>
+    <button type="button"
+            class="btn-close shadow-none"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body pb-0">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "ductForm" }))
+    {
+        @Html.HiddenFor(m => m.DuctViewModel.UniqueId, new { id = "hdnDuctUniqueId" })
+        @Html.HiddenFor(m => m.DuctViewModel.UniqueGuid, new { id = "hdnDuctUniqueGUID" })
+        @Html.HiddenFor(m => m.DuctViewModel.ConduitGuid, new { id = "hdnConduitGuid" })
+
+        <div class="row g-4">
+            <!-- Duct IDs -->
+            <div class="col-12">
+                @Html.LabelFor(m => m.DuctViewModel.DuctId, "Duct ID(s)", new { @class = "form-label" })
+                <div class="d-flex gap-3 duct-inputs">
+                    <div class="w-100">
+                        @Html.TextBoxFor(m => m.DuctViewModel.DuctId, new { @class = "form-control mb-4", id = "DuctId1" })
+                        @Html.TextBoxFor(m => m.DuctViewModel.DuctIdb, new { @class = "form-control", id = "DuctId2" })
+                    </div>
+                    <div class="d-flex flex-column flex-shrink-0">
+                        <label class="form-label mb-4">@("@" + Model.DuctViewModel.StructureA)</label>
+                        <label class="form-label mb-4">@("@" + Model.DuctViewModel.StructureB)</label>
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.DuctViewModel.DuctId, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Duct Type -->
+            <div class="col-12">
+                <label class="form-label">Duct Type</label>
+
+                <select class="form-select" id="ddlDuctType" name="DuctType" @(Model.DuctViewModel.UniqueId > 0 ? "disabled=\"disabled\"" : "")>
+                    @if (Model.DuctViewModel.UniqueId == 0)
+                    {
+                        <option value="">-- Select Duct Type --</option>
+                    }
+
+                    @foreach (var item in Model.DuctViewModel.DuctTypesList)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+
+                @if (Model.DuctViewModel.UniqueId > 0)
+                {
+                    @Html.HiddenFor(m => m.DuctViewModel.DuctType)
+                }
+
+                @Html.ValidationMessageFor(m => m.DuctViewModel.DuctType, "", new { @class = "text-danger" })
+            </div>
+
+
+
+            
+
+            <!-- SubDucts -->
+            @if (isEdit)
+            {
+                <div class="col-12">
+                    @Html.LabelFor(m => m.DuctViewModel.SubDucts, new { @class = "form-label" })
+                    <div class="d-flex gap-3">
+                        <div class="form-control overflow-auto tree-view-container" style="height: 200px; width: 100%; padding: 1rem;" id="ductTreeSection">
+                            <ul class="tree-view mb-0" id="ductTree">
+                                <li>
+                                    <span class="fw-bold">Ducts</span>
+                                    <ul class="expand">
+                                        @foreach (var duct in Model.DuctViewModel.SubDuctList)
+                                        {
+                                            var subDucts = Model.ConduitViewModel.SubDuctList?
+                                            .Where(s => s.Value.StartsWith(duct.Label + "-"))
+                                            .ToList();
+
+                                            <li data-duct-id="@duct.Label">
+                                                <span class="indicator">
+                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                </span>
+                                                <input name="sub_duct_radio_duct" class="form-check-input me-1" type="radio" value="@duct.Id" />
+                                                <label>@duct.Label</label>
+
+                                                @if (subDucts?.Any() == true)
+                                                {
+                                                    <ul class="collapse">
+                                                        @foreach (var sub in subDucts)
+                                                        {
+                                                            <li data-duct-id="@sub.Value">
+                                                                <input name="sub_duct_radio_duct" class="form-check-input me-1" type="radio" value="@sub.Value" />
+                                                                <label>@sub.Text</label>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        @*  @Html.TextAreaFor(m => m.DuctViewModel.SubDucts, new { @class = "form-control", rows = 5, id = "txtSubDucts" }) *@
+
+                        <div class="d-flex flex-column gap-2 add-edit-btns">
+                            <button type="button" class="btn add" id="btn-add-sub-duct" title="Add">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <button type="button" id="btn-delete-sub-duct" class="btn delete" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DuctViewModel.SubDucts, "", new { @class = "text-danger" })
+                </div>
+            }
+            
+
+            <!-- Comments -->
+            <div class="col-12">
+                @Html.LabelFor(m => m.DuctViewModel.Comments, new { @class = "form-label" })
+                @Html.TextAreaFor(m => m.DuctViewModel.Comments, new { @class = "form-control", rows = 4, id = "txtComments" })
+                @Html.ValidationMessageFor(m => m.DuctViewModel.Comments, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer border-0 gap-3">
+    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+        Close
+    </button>
+    <button type="button" id="btnSubmitDuct" class="btn btn-primary">@buttonLabel</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.validator.unobtrusive.parse("#ductForm");
+    });
+</script>

@@ -1,0 +1,74 @@
+﻿@model FhaFacilitiesApplication.Models.ViewModel.DashboardViewModel
+@{
+    bool hasData = Model.Splices != null && Model.Splices.Any();
+}
+
+<div class="title d-flex justify-content-between align-items-center gap-3 pb-3">
+    <h6 class="mb-0">
+        <span><i class="fa-solid fa-server"></i></span> Connection
+        Enclosure
+    </h6>
+    <div class="d-flex gap-2 add-edit-btns">
+        <button id="btnDeleteSplice" class="btn delete" data-rel="tooltip" title="Delete Splice" disabled>
+            <i class="fa-solid fa-trash"></i>
+        </button>
+        <button id="btnEditSplice" class="btn edit" data-rel="tooltip" title="Edit Splice" disabled>
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button id="btnAddSplices" class="btn add" data-rel="tooltip" title="Add" disabled>
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </div>
+</div>
+@if (hasData)
+{
+    <div class="form-check-list">
+        @foreach (var splices in Model?.Splices!)
+        {
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="radio"
+                       value="@splices.UniqueId"
+                       name="splicesRadio"
+                       data-unique-guid="@splices.UniqueGuid"
+                       id="splices_@splices.UniqueId" />
+                <label class="form-check-label" for="splices_@splices.UniqueId">
+                    @splices.SpliceID - @splices.SpliceType
+                </label>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="no-data flex-fill">
+        <div class="d-flex justify-content-center align-items-center flex-column gap-4 text-center p-3 h-100">
+            <img src="./images/no-data.png"
+                 class="img-fluiid"
+                 alt="No Data" />
+            <p class="mb-0">Select a campus to see available Splice</p>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="delete-splice-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable delete-modal modal-lg">
+        <div class="modal-content py-4">
+            <div class="modal-body text-center">
+                <img src="./images/delete.png" class="img-fluid mb-4" alt="Delete" />
+                <h6 class="mb-3 fw-medium">
+                    Are you sure you want to delete this item?
+                </h6>
+                <p class="mb-4">
+                    This action cannot be undone. The item will be permanently removed.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn btn-gray" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" id="btnDeleteSpliceProceed" class="btn btn-red-2">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
