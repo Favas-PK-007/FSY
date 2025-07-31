@@ -28,8 +28,8 @@ namespace FhaFacilitiesApplication.Controllers
         /// <returns>A View with the list of campuses.</returns>
         public async Task<IActionResult> GetCampus()
         {
-            var campuses = await _campusService.GetCampusListAsync();
-            return View(campuses); // Pass campus list to the view
+            //var campuses = await _campusService.GetCampusListAsync();
+            return View(); // Pass campus list to the view
         }
 
         #region AddCampus View
